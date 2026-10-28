@@ -45,6 +45,7 @@ Hay **dos relojes independientes**:
 | Requisito | Dónde |
 |---|---|
 | Enfoque híbrido | Phaser (web) + Capacitor → APK/AAB Android |
+| Wireframe en escala de grises | [Figma](https://www.figma.com/design/13NCFqUkchjfIDZxMwRnN4) y `docs/wireframes/` |
 | Mínimo 3 niveles | 7 niveles (`src/data/levels.ts`) |
 | Control de tiempo | Reloj por nivel + 3:00 por bomba |
 | 5 secciones | **Splash** (`SplashScene`), **Home** (`HomeScene` + `LevelSelectScene`), **Juego** (`GameScene` + `DefuseScene`), **Puntaje** (`ScoreScene`), **Créditos** (`CreditsScene`) |
@@ -62,6 +63,20 @@ Hay **dos relojes independientes**:
 3. **Tiempo secreto**: toca 5 veces rápido el cronómetro del nivel → +15 s (una vez por intento).
 
 El progreso de los huevos se ve en Puntajes.
+
+## Diseño
+
+Wireframes en escala de grises: **[Pixelminas — Wireframes (Figma)](https://www.figma.com/design/13NCFqUkchjfIDZxMwRnN4)**. Son 19 pantallas a 360×640, la misma resolución lógica del juego, repartidas en cinco secciones. Cada pantalla lleva debajo una nota con su comportamiento. Las imágenes exportadas están en `docs/wireframes/`.
+
+| Sección | Pantallas |
+|---|---|
+| [Mapa de navegación](docs/wireframes/0-mapa-de-navegacion.png) | Cómo se conectan las pantallas |
+| [Splash y menú](docs/wireframes/1-splash-y-menu.png) | Splash, Home, Cómo jugar, Selección de nivel |
+| [Partida](docs/wireframes/2-partida.png) | Intro de nivel, Juego, Pausa, Nivel superado, Explosión |
+| [Desactivación](docs/wireframes/3-desactivacion.png) | Pantalla base y los 7 mini juegos |
+| [Puntajes y créditos](docs/wireframes/4-puntajes-y-creditos.png) | Las dos pantallas finales |
+
+![Wireframes de la partida](docs/wireframes/2-partida.png)
 
 ## Estructura del código
 
@@ -106,7 +121,7 @@ npx cap open android
 En Android Studio:
 
 1. **Probar**: conecta un teléfono con depuración USB (o un emulador) y pulsa ▶ Run.
-2. **Ícono**: clic derecho en `app` → New → Image Asset para reemplazar el ícono de Capacitor.
+2. **Ícono**: ya está el de PixelMinas (la bomba del juego sobre azul noche) en `android/app/src/main/res/mipmap-*`. Para rehacerlo, clic derecho en `app` → New → Image Asset.
 3. **Versión**: en `android/app/build.gradle`, sube `versionCode` en cada subida a Play.
 4. **AAB firmado**: Build → Generate Signed App Bundle / APK → Android App Bundle → crea un *keystore* nuevo (**guárdalo junto con su contraseña: sin él no se pueden publicar actualizaciones**; está en `.gitignore`, no lo subas al repo).
 5. En **Google Play Console**: crea la app, completa la ficha (descripción, capturas, ícono de 512 px, gráfico de 1024×500), la clasificación de contenido, la política de privacidad (el juego no recoge datos personales) y el formulario de seguridad de datos. Sube el `.aab` a *Prueba interna* o *Producción*.
