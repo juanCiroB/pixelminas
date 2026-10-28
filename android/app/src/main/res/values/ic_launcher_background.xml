@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Azul noche de la paleta Sweetie 16, el mismo fondo de los menús del juego. -->
+    <color name="ic_launcher_background">#29366F</color>
 </resources>
