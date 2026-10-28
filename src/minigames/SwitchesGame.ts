@@ -1,0 +1,72 @@
+import Phaser from 'phaser';
+import { C, PAL, txt } from '../theme';
+import { Sfx } from '../services/Sfx';
+import { PixelButton } from '../ui/PixelButton';
+import { Minigame } from './Minigame';
+
+const VALUES = [16, 8, 4, 2, 1];
+
+/** Nivel 2: poner los interruptores para formar un número en binario. */
+export class SwitchesGame extends Minigame {
+  private states: boolean[] = [];
+
+  build(): void {
+    const d = this.host.difficulty;
+    const target = Phaser.Math.Between(1, 30);
+    const inverted = d >= 4 || (d >= 2 && Math.random() < 0.5);
+    const required = inverted ? 31 - target : target;
+
+    const top = this.manual(
+      'Cada interruptor vale (izq. a der.):\n16 · 8 · 4 · 2 · 1\n' +
+        'ARRIBA = suma su valor.\n' +
+        'Haz que la suma sea el número de la pantalla y pulsa CONFIRMAR.\n' +
+        'Si la pantalla está en ROJO, la suma debe ser 31 MENOS el número.',
+    );
+
+    // Pantalla LCD.
+    this.add(this.scene.add.rectangle(this.cx, top + 34, 160, 56, C.ink).setStrokeStyle(4, C.gray));
+    const lcd = this.add(txt(this.scene, this.cx, top + 36, String(target).padStart(2, '0'), 24, inverted ? PAL.red : PAL.lime));
+    this.scene.tweens.add({ targets: lcd, alpha: 0.7, duration: 400, yoyo: true, repeat: -1 });
+
+    do {
+      this.states = VALUES.map(() => Math.random() < 0.5);
+    } while (this.sum() === required);
+
+    const y0 = top + 110;
+    const spacing = 62;
+    const startX = this.cx - spacing * 2;
+    VALUES.forEach((_, i) => {
+      const x = startX + i * spacing;
+      const led = this.add(this.scene.add.circle(x, y0, 7, C.slate).setStrokeStyle(2, C.ink));
+      this.add(this.scene.add.rectangle(x, y0 + 70, 40, 92, C.slate).setStrokeStyle(2, C.ink));
+      this.add(this.scene.add.rectangle(x, y0 + 70, 10, 70, C.ink));
+      const knob = this.add(this.scene.add.rectangle(x, 0, 30, 30, C.silver).setStrokeStyle(2, C.ink));
+      const place = (animate: boolean) => {
+        const ky = y0 + (this.states[i] ? 46 : 94);
+        if (animate) this.scene.tweens.add({ targets: knob, y: ky, duration: 90 });
+        else knob.y = ky;
+        led.setFillStyle(this.states[i] ? C.lime : C.slate);
+      };
+      place(false);
+      const hit = this.add(this.scene.add.rectangle(x, y0 + 70, 52, 110, 0, 0).setInteractive({ useHandCursor: true }));
+      hit.on('pointerdown', () => {
+        if (this.done) return;
+        this.states[i] = !this.states[i];
+        Sfx.play('toggle');
+        place(true);
+      });
+    });
+
+    this.add(txt(this.scene, this.cx, y0 + 140, 'ARRIBA = ENCENDIDO', 8, PAL.silver));
+
+    this.add(new PixelButton(this.scene, this.cx, y0 + 190, 200, 40, 'CONFIRMAR', () => {
+      if (this.done) return;
+      if (this.sum() === required) this.win();
+      else this.host.strike(undefined, 'SUMA INCORRECTA');
+    }, { color: C.red }));
+  }
+
+  private sum(): number {
+    return this.states.reduce((acc, on, i) => acc + (on ? VALUES[i] : 0), 0);
+  }
+}
