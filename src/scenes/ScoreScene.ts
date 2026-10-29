@@ -24,37 +24,39 @@ export class ScoreScene extends Phaser.Scene {
     if (finished) {
       this.registry.set('gameCompleted', false);
       confetti(this);
-      toast(this, '¡DESACTIVASTE LOS 7 NIVELES!', PAL.lime, 90);
+      toast(this, `¡DESACTIVASTE LOS ${LEVELS.length} NIVELES!`, PAL.lime, 90);
     }
 
     txt(this, cx, 36, 'PUNTAJES', 16, PAL.yellow).setStroke(PAL.ink, 4);
 
-    this.add.existing(panel(this, cx, 200, 320, 250));
-    txt(this, cx, 94, 'MEJOR POR NIVEL', 8, PAL.cyan);
+    // Récords en dos columnas de 10 niveles.
+    this.add.existing(panel(this, cx, 192, 320, 284));
+    txt(this, cx, 66, 'MEJOR POR NIVEL', 8, PAL.cyan);
+    const perCol = Math.ceil(LEVELS.length / 2);
     LEVELS.forEach((lvl, i) => {
-      const y = 120 + i * 24;
+      const left = i < perCol ? 34 : 194;
+      const y = 90 + (i % perCol) * 21;
       const best = Save.data.best[lvl.id];
       const locked = lvl.id > Save.data.unlocked;
-      const color = locked ? PAL.gray : PAL.white;
-      txt(this, 40, y, `${lvl.id}. ${lvl.name}`, 8, color).setOrigin(0, 0.5);
-      txt(this, 320, y, best ? String(best) : '---', 8, best ? PAL.yellow : PAL.gray).setOrigin(1, 0.5);
+      txt(this, left, y, `${lvl.id}.`, 8, locked ? PAL.gray : PAL.white).setOrigin(0, 0.5);
+      txt(this, left + 132, y, best ? String(best) : '---', 8, best ? PAL.yellow : PAL.gray).setOrigin(1, 0.5);
     });
-    const total = txt(this, cx, 300, `TOTAL: ${Save.totalBest()}`, 16, PAL.lime);
+    const total = txt(this, cx, 312, `TOTAL: ${Save.totalBest()}`, 16, PAL.lime);
     this.tweens.add({ targets: total, scale: 1.08, duration: 500, yoyo: true, repeat: -1 });
 
-    this.add.existing(panel(this, cx, 425, 320, 160));
-    txt(this, cx, 362, 'ÚLTIMAS PARTIDAS', 8, PAL.cyan);
+    this.add.existing(panel(this, cx, 440, 320, 150));
+    txt(this, cx, 382, 'ÚLTIMAS PARTIDAS', 8, PAL.cyan);
     const recent = Save.data.history.slice(0, 5);
-    if (recent.length === 0) txt(this, cx, 420, 'AÚN NO HAY PARTIDAS', 8, PAL.gray);
+    if (recent.length === 0) txt(this, cx, 440, 'AÚN NO HAY PARTIDAS', 8, PAL.gray);
     recent.forEach((r, i) => {
       const d = new Date(r.date);
       const date = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const y = 388 + i * 20;
+      const y = 406 + i * 20;
       txt(this, 40, y, `${date}  NIVEL ${r.level}`, 8, PAL.white).setOrigin(0, 0.5);
       txt(this, 320, y, String(r.score), 8, PAL.yellow).setOrigin(1, 0.5);
     });
 
-    txt(this, cx, 528, `HUEVOS DE PASCUA: ${Save.data.eggs.length}/${TOTAL_EGGS}`, 8, Save.data.eggs.length ? PAL.orange : PAL.gray);
+    txt(this, cx, 538, `HUEVOS DE PASCUA: ${Save.data.eggs.length}/${TOTAL_EGGS}`, 8, Save.data.eggs.length ? PAL.orange : PAL.gray);
 
     new PixelButton(this, cx - 80, 590, 140, 32, 'VOLVER', () => goTo(this, 'Home'), { color: C.slate });
     const reset = new PixelButton(this, cx + 80, 590, 140, 32, 'BORRAR', () => {
