@@ -88,12 +88,47 @@ export class GameScene extends Phaser.Scene {
     this.events.on('defuse-result', (r: DefuseResult) => this.onDefuseResult(r));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('defuse-result'));
 
+    this.showIntro();
+  }
+
+  /**
+   * Presentación del nivel. Mientras se ve, el juego está bloqueado (busy) y el
+   * reloj no corre; un toque en cualquier parte la salta. Así ningún toque llega
+   * al tablero mientras las casillas todavía están apareciendo.
+   */
+  private showIntro(): void {
+    this.busy = true;
+    const shade = this.add.rectangle(0, 0, GAME_W, GAME_H, C.ink, 0.6).setOrigin(0).setDepth(89).setInteractive();
     const intro = txt(this, GAME_W / 2, GAME_H / 2 - 20, `NIVEL ${this.lvl.id}\n${this.lvl.name}`, 16, PAL.yellow).setStroke(PAL.ink, 6).setDepth(90);
     // Aclara los dos relojes: el del buscaminas y los 3:00 de cada mini juego.
     const times = txt(this, GAME_W / 2, GAME_H / 2 + 34, `BUSCAMINAS: ${formatTime(this.lvl.time)}\nCADA BOMBA: ${formatTime(DEFUSE_TIME)}`, 8, PAL.white)
       .setStroke(PAL.ink, 4).setDepth(90);
+    const skip = txt(this, GAME_W / 2, GAME_H / 2 + 90, 'TOCA PARA EMPEZAR', 8, PAL.silver).setDepth(90);
     this.tweens.add({ targets: [intro, times], scale: { from: 0, to: 1 }, duration: 300, ease: 'Back.easeOut' });
-    this.tweens.add({ targets: [intro, times], alpha: 0, delay: 1800, duration: 300, onComplete: () => { intro.destroy(); times.destroy(); } });
+    this.tweens.add({ targets: skip, alpha: 0.3, duration: 400, yoyo: true, repeat: -1 });
+
+    let ended = false;
+    const end = () => {
+      if (ended) return;
+      ended = true;
+      shade.disableInteractive();
+      // Las casillas terminan de aparecer de golpe para que el tablero quede estable.
+      for (const c of this.cells) {
+        this.tweens.killTweensOf(c.tile);
+        c.tile.setAlpha(1);
+      }
+      this.tweens.killTweensOf([intro, times, skip]);
+      this.tweens.add({
+        targets: [shade, intro, times, skip],
+        alpha: 0,
+        duration: 200,
+        onComplete: () => [shade, intro, times, skip].forEach((o) => o.destroy()),
+      });
+      this.busy = false;
+    };
+    // Se salta al soltar el dedo, para que ese mismo toque no excave una casilla.
+    shade.once('pointerup', end);
+    this.time.delayedCall(2200, end);
   }
 
   // ---------- Interfaz ----------
@@ -278,8 +313,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawRevealed(c: Cell): void {
-    c.tile.setTexture('tile_open').setDisplaySize(this.cs, this.cs);
-    this.tweens.add({ targets: c.tile, scaleX: c.tile.scaleX * 0.8, scaleY: c.tile.scaleY * 0.8, duration: 60, yoyo: true });
+    // Se cancela cualquier animación previa de la casilla y se parte del tamaño base,
+    // para que dos animaciones superpuestas no la dejen encogida o transparente.
+    this.tweens.killTweensOf(c.tile);
+    c.tile.setTexture('tile_open').setAlpha(1).setDisplaySize(this.cs, this.cs);
+    const base = c.tile.scaleX;
+    this.tweens.add({ targets: c.tile, scaleX: base * 0.8, scaleY: base * 0.8, duration: 60, yoyo: true });
     if (c.n > 0) {
       c.label = txt(this, c.tile.x, c.tile.y + 1, String(c.n), this.cs >= 28 ? 16 : 8, NUM_COLORS[c.n]);
     }
