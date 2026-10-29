@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { GAME_H, GAME_W, PAL } from './theme';
 import { Sfx } from './services/Sfx';
+import { Ads } from './services/Ads';
 import { BootScene } from './scenes/BootScene';
 import { SplashScene } from './scenes/SplashScene';
 import { HomeScene } from './scenes/HomeScene';
@@ -37,6 +38,8 @@ async function start(): Promise<void> {
     /* si falla, se usa la fuente monoespaciada de respaldo */
   }
   const game = new Phaser.Game(config);
+  // Banner pequeño abajo, solo en los menús (ver src/data/ads.ts).
+  void Ads.init(game);
   // Solo en desarrollo: acceso desde la consola del navegador para depurar.
   if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
 
