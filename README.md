@@ -96,6 +96,7 @@ src/
   data/levels.ts          Definición de los 20 niveles y la escala de dificultad
   data/credits.ts         Nombres del equipo (¡editar!)
   services/Save.ts        Persistencia (localStorage)
+  services/Ads.ts         Banner de AdMob en los menús (configuración en data/ads.ts)
   services/Sfx.ts         Sintetizador de sonidos y música
   ui/PixelArt.ts          Sprites a partir de mapas de caracteres
   ui/PixelButton.ts       Botón y panel pixel art
@@ -133,9 +134,31 @@ En Android Studio:
 2. **Ícono**: ya está el de PixelMinas (la bomba del juego sobre azul noche) en `android/app/src/main/res/mipmap-*`. Para rehacerlo, clic derecho en `app` → New → Image Asset.
 3. **Versión**: en `android/app/build.gradle`, sube `versionCode` en cada subida a Play.
 4. **AAB firmado**: Build → Generate Signed App Bundle / APK → Android App Bundle → crea un *keystore* nuevo (**guárdalo junto con su contraseña: sin él no se pueden publicar actualizaciones**; está en `.gitignore`, no lo subas al repo).
-5. En **Google Play Console**: crea la app, completa la ficha (descripción, capturas, ícono de 512 px, gráfico de 1024×500), la clasificación de contenido, la política de privacidad (el juego no recoge datos personales) y el formulario de seguridad de datos. Sube el `.aab` a *Prueba interna* o *Producción*.
+5. En **Google Play Console**: crea la app, completa la ficha (descripción, capturas, ícono de 512 px, gráfico de 1024×500), la clasificación de contenido, la política de privacidad y el formulario de seguridad de datos (ver *Anuncios* abajo). Sube el `.aab` a *Prueba interna* o *Producción*.
 
 > Nota: las cuentas personales nuevas de Play Console deben hacer una **prueba cerrada con testers durante 14 días** antes de publicar en producción. Conviene empezar pronto.
+
+### Anuncios (AdMob)
+
+El juego muestra un **banner pequeño abajo, solo en los menús**: Home, selección de nivel, Puntajes y Créditos. Nunca aparece en la partida ni en la desactivación. Mientras el banner está visible, el juego se encoge lo que mide el anuncio, así no tapa ningún botón. Si el anuncio no carga (por ejemplo, sin internet), el juego vuelve a ocupar toda la pantalla.
+
+- Código: `src/services/Ads.ts`. Configuración: `src/data/ads.ts`.
+- En el navegador, durante el desarrollo, aparece un recuadro gris "ANUNCIO" que muestra el espacio reservado. En la app se muestra el anuncio real.
+- Ahora usa los **anuncios de prueba oficiales de Google**. Se pueden tocar sin riesgo.
+
+Para cobrar con anuncios reales:
+
+1. Crear una cuenta en [AdMob](https://admob.google.com), añadir la app Android y crear un bloque de anuncios de tipo **Banner**.
+2. En `src/data/ads.ts`: poner el ID del bloque en `BANNER_ID` y cambiar `USE_TEST_ADS` a `false`.
+3. En `android/app/src/main/res/values/strings.xml`: poner el **ID de la app** (`ca-app-pub-…~…`) en `admob_app_id`.
+4. **No tocar los anuncios propios** con los IDs reales: Google puede suspender la cuenta. Para probar, añadir el teléfono como dispositivo de prueba en AdMob.
+5. En Play Console:
+   - Marcar que la app **contiene anuncios**.
+   - En *Seguridad de los datos*, declarar que se recoge el **ID de publicidad** (lo usa AdMob).
+   - En la política de privacidad, mencionar que se usa AdMob.
+   - Si el público objetivo incluye menores de 13 años, hay que cumplir la política de Familias de Google.
+
+En regiones que lo exigen, como la Unión Europea, el formulario de consentimiento de Google aparece solo la primera vez.
 
 ## Uso de IA (justificación)
 
