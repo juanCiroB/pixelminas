@@ -4,4 +4,6 @@
     <string name="title_activity_main">PixelMinas</string>
     <string name="package_name">com.pixelminas.game</string>
     <string name="custom_url_scheme">com.pixelminas.game</string>
+    <!-- ID de la APP de AdMob (no el del bloque de anuncios). Este es el de prueba de Google: cambiarlo antes de publicar. -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>
