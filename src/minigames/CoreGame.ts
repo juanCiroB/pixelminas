@@ -4,7 +4,7 @@ import { Sfx } from '../services/Sfx';
 import { PixelButton } from '../ui/PixelButton';
 import { Minigame } from './Minigame';
 
-/** Nivel 7: apagar todas las luces del núcleo; cada toque invierte la celda y sus vecinas. */
+/** Núcleo: apagar todas las luces del núcleo; cada toque invierte la celda y sus vecinas. */
 export class CoreGame extends Minigame {
   private size = 4;
   private lights: boolean[] = [];
@@ -15,8 +15,9 @@ export class CoreGame extends Minigame {
 
   build(): void {
     const d = this.host.difficulty;
-    this.size = d < 2 ? 4 : 5;
-    const presses = [4, 5, 5, 5, 6][d] ?? 6;
+    // Dificultad 0..6: panel más grande y más luces encendidas al empezar.
+    this.size = [3, 4, 4, 4, 5, 5, 5][d] ?? 5;
+    const presses = [3, 3, 4, 5, 5, 6, 7][d] ?? 7;
 
     // Se parte del panel apagado y se aplican toques al azar: así siempre tiene solución.
     do {

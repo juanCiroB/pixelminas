@@ -5,7 +5,7 @@ import { C, PAL, txt } from '../theme';
 export interface MGHost {
   scene: Phaser.Scene;
   area: Phaser.Geom.Rectangle; // zona de pantalla disponible
-  difficulty: number; // 0..4: índice de la bomba dentro del nivel
+  difficulty: number; // 0..6: ver difficultyFor() en data/levels.ts
   success(): void;
   strike(seconds?: number, why?: string): void;
 }

@@ -4,10 +4,9 @@ import { Sfx } from '../services/Sfx';
 import { PixelButton } from '../ui/PixelButton';
 import { Minigame } from './Minigame';
 
-const MAX_TRIES = 6;
-
-/** Nivel 4: deducir un código secreto con pistas de colores. */
+/** Código: deducir un código secreto con pistas de colores. */
 export class CodeGame extends Minigame {
+  private maxTries = 6;
   private code: number[] = [];
   private guess: number[] = [];
   private tries = 0;
@@ -17,13 +16,17 @@ export class CodeGame extends Minigame {
   private rowsTop = 0;
 
   build(): void {
-    const len = this.host.difficulty < 2 ? 3 : 4;
-    this.code = Phaser.Utils.Array.Shuffle([1, 2, 3, 4, 5, 6]).slice(0, len);
+    // Dificultad 0..6: código de 3 o 4 dígitos y, desde 4, dígitos del 1 al 8.
+    const diff = this.host.difficulty;
+    const len = diff < 2 ? 3 : 4;
+    const digits = diff >= 4 ? 8 : 6;
+    this.maxTries = diff >= 4 ? 7 : 6;
+    this.code = Phaser.Utils.Array.Shuffle(Array.from({ length: digits }, (_, i) => i + 1)).slice(0, len);
 
     const top = this.manual(
-      `Adivina el código de ${len} dígitos (del 1 al 6, sin repetir).\n` +
+      `Adivina el código de ${len} dígitos (del 1 al ${digits}, sin repetir).\n` +
         'VERDE: dígito y posición correctos.\nAMARILLO: está, pero en otro lugar.\nGRIS: no está.\n' +
-        `Cada ${MAX_TRIES} intentos fallidos: -20s.`,
+        `Cada ${this.maxTries} intentos fallidos: -20s.`,
     );
 
     this.triesText = this.add(txt(this.scene, this.cx, top + 4, '', 8, PAL.silver));
@@ -31,10 +34,13 @@ export class CodeGame extends Minigame {
     this.board = this.add(this.scene.add.container(0, 0));
 
     const keysTop = this.rowsTop + 7 * 30 + 10;
-    for (let d = 1; d <= 6; d++) {
-      const col = (d - 1) % 3;
-      const row = Math.floor((d - 1) / 3);
-      this.add(new PixelButton(this.scene, this.cx - 70 + col * 70, keysTop + row * 46, 60, 38, String(d), () => this.type(d), { color: C.blue, size: 16, sound: false }));
+    const perRow = digits / 2;
+    const step = perRow === 4 ? 66 : 70;
+    for (let d = 1; d <= digits; d++) {
+      const col = (d - 1) % perRow;
+      const row = Math.floor((d - 1) / perRow);
+      const x = this.cx - (step * (perRow - 1)) / 2 + col * step;
+      this.add(new PixelButton(this.scene, x, keysTop + row * 46, 60, 38, String(d), () => this.type(d), { color: C.blue, size: 16, sound: false }));
     }
     this.add(new PixelButton(this.scene, this.cx - 60, keysTop + 94, 110, 36, 'BORRAR', () => {
       this.guess.pop();
@@ -68,7 +74,7 @@ export class CodeGame extends Minigame {
       return;
     }
     this.tries++;
-    if (this.tries >= MAX_TRIES) {
+    if (this.tries >= this.maxTries) {
       this.tries = 0;
       this.host.strike(undefined, 'DEMASIADOS INTENTOS');
     }
@@ -96,6 +102,6 @@ export class CodeGame extends Minigame {
         if (d) this.board.add(txt(this.scene, rect.x, y + 1, String(d), 16, PAL.white));
       }
     });
-    this.triesText.setText(`INTENTOS: ${this.tries}/${MAX_TRIES}`);
+    this.triesText.setText(`INTENTOS: ${this.tries}/${this.maxTries}`);
   }
 }

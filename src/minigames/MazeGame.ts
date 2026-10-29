@@ -12,7 +12,7 @@ const DIRS = [
   { bit: 8, dx: -1, dy: 0, opp: 2 },
 ];
 
-/** Nivel 5: recorrer un laberinto con niebla hasta el corte de energía. */
+/** Laberinto: recorrer un laberinto con niebla hasta el corte de energía. */
 export class MazeGame extends Minigame {
   private size = 6;
   private fog = 2;
@@ -29,8 +29,9 @@ export class MazeGame extends Minigame {
 
   build(): void {
     const d = this.host.difficulty;
-    this.size = d < 3 ? 6 : 7;
-    this.fog = d < 2 ? 2 : 1;
+    // Dificultad 0..6: laberinto más grande y menos visibilidad.
+    this.size = [5, 6, 6, 7, 7, 8, 8][d] ?? 8;
+    this.fog = [3, 2, 2, 2, 1, 1, 1][d] ?? 1;
     this.generate();
 
     const top = this.manual(

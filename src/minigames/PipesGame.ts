@@ -13,7 +13,7 @@ const STEPS = [
 ];
 const rotateCW = (m: number) => ((m << 1) | (m >> 3)) & 15;
 
-/** Nivel 6: girar tuberías para llevar refrigerante al núcleo de la bomba. */
+/** Tuberías: girar tuberías para llevar refrigerante al núcleo de la bomba. */
 export class PipesGame extends Minigame {
   private size = 4;
   private masks: number[] = [];
@@ -25,7 +25,8 @@ export class PipesGame extends Minigame {
   private g!: Phaser.GameObjects.Graphics;
 
   build(): void {
-    this.size = this.host.difficulty < 2 ? 4 : 5;
+    // Dificultad 0..6: la cuadrícula pasa de 4x4 a 6x6.
+    this.size = [4, 4, 4, 5, 5, 5, 6][this.host.difficulty] ?? 6;
     this.generate();
 
     const top = this.manual(

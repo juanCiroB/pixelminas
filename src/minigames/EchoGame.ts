@@ -11,16 +11,20 @@ const PADS: { color: number; sound: SfxName }[] = [
   { color: C.yellow, sound: 'padY' },
 ];
 
-/** Nivel 3: memorizar una secuencia de luces y repetirla al revés. */
+/** Eco inverso: memorizar una secuencia de luces y repetirla al revés. */
 export class EchoGame extends Minigame {
   private seq: number[] = [];
   private input: number[] = [];
   private locked = true;
   private pads: Phaser.GameObjects.Rectangle[] = [];
   private status!: Phaser.GameObjects.Text;
+  private step = 600; // ms entre luces
 
   build(): void {
-    const len = [4, 4, 5, 5, 6][this.host.difficulty] ?? 6;
+    // Dificultad 0..6: secuencia más larga y, desde 5, más rápida.
+    const d = this.host.difficulty;
+    const len = [3, 4, 4, 5, 5, 6, 7][d] ?? 7;
+    this.step = d >= 5 ? 470 : 600;
     this.seq = Array.from({ length: len }, () => Phaser.Math.Between(0, 3));
 
     const top = this.manual(
@@ -60,8 +64,8 @@ export class EchoGame extends Minigame {
     this.locked = true;
     this.input = [];
     this.status.setText('OBSERVA...').setColor(PAL.yellow);
-    this.seq.forEach((p, i) => this.scene.time.delayedCall(i * 600, () => this.flash(p)));
-    this.scene.time.delayedCall(this.seq.length * 600 + 200, () => {
+    this.seq.forEach((p, i) => this.scene.time.delayedCall(i * this.step, () => this.flash(p, this.step - 250)));
+    this.scene.time.delayedCall(this.seq.length * this.step + 200, () => {
       if (this.done) return;
       this.locked = false;
       this.updateStatus();

@@ -6,22 +6,28 @@ import { Minigame } from './Minigame';
 type WireColor = 'ROJO' | 'AZUL' | 'AMARILLO' | 'BLANCO' | 'VERDE';
 const COLORS: Record<WireColor, number> = { ROJO: C.red, AZUL: C.blue, AMARILLO: C.yellow, BLANCO: C.white, VERDE: C.green };
 
-/** Nivel 1: cortar el cable correcto siguiendo reglas en orden. */
+/** Cables: cortar el cable correcto siguiendo reglas en orden. */
 export class WiresGame extends Minigame {
   private wires: WireColor[] = [];
   private answer = 0;
+  private vowelRule = false;
 
   build(): void {
-    const n = this.host.difficulty < 2 ? 4 : 5;
+    // Dificultad 0..6: más cables y, desde 4, una regla extra al principio.
+    const d = this.host.difficulty;
+    const n = [3, 4, 4, 5, 5, 6, 6][d] ?? 6;
+    this.vowelRule = d >= 4;
     const pool = Object.keys(COLORS) as WireColor[];
     this.wires = Array.from({ length: n }, () => Phaser.Utils.Array.GetRandom(pool));
     const letters = 'ABCDEFGHJKLMNPRSTUVXZ';
     const serial = `${letters[Phaser.Math.Between(0, letters.length - 1)]}${letters[Phaser.Math.Between(0, letters.length - 1)]}-${Phaser.Math.Between(100, 999)}`;
     const lastDigit = Number(serial[serial.length - 1]);
-    this.answer = this.solve(lastDigit);
+    this.answer = this.solve(lastDigit, /[AEIOU]/.test(serial));
 
+    const extra = this.vowelRule ? '0. Serial con VOCAL y hay cable BLANCO: corta el último blanco.\n' : '';
     const top = this.manual(
       'Aplica la PRIMERA regla que se cumpla:\n' +
+        extra +
         '1. Más de un cable ROJO: corta el último rojo.\n' +
         '2. Serial termina en IMPAR: corta el primer cable.\n' +
         '3. No hay cables AZULES: corta el segundo.\n' +
@@ -30,7 +36,8 @@ export class WiresGame extends Minigame {
     );
 
     // Caja de la bomba con placa del número de serie.
-    const boxH = 70 + n * 52;
+    const gap = n >= 6 ? 44 : 52;
+    const boxH = 70 + n * gap;
     const { x, width } = this.area;
     this.add(this.scene.add.rectangle(x + 10, top, width - 20, boxH, C.slate).setOrigin(0).setStrokeStyle(2, C.gray));
     this.add(this.scene.add.rectangle(this.cx, top + 24, 170, 26, C.white).setStrokeStyle(2, C.ink));
@@ -39,7 +46,7 @@ export class WiresGame extends Minigame {
     const left = x + 40;
     const right = x + width - 40;
     this.wires.forEach((color, i) => {
-      const y = top + 70 + i * 52;
+      const y = top + 70 + i * gap;
       this.add(this.scene.add.rectangle(left - 12, y, 16, 22, C.gray).setStrokeStyle(2, C.ink));
       this.add(this.scene.add.rectangle(right + 12, y, 16, 22, C.gray).setStrokeStyle(2, C.ink));
       const g = this.add(this.scene.add.graphics());
@@ -51,8 +58,9 @@ export class WiresGame extends Minigame {
     });
   }
 
-  private solve(lastDigit: number): number {
+  private solve(lastDigit: number, hasVowel: boolean): number {
     const w = this.wires;
+    if (this.vowelRule && hasVowel && w.includes('BLANCO')) return w.lastIndexOf('BLANCO');
     const reds = w.filter((c) => c === 'ROJO').length;
     if (reds > 1) return w.lastIndexOf('ROJO');
     if (lastDigit % 2 === 1) return 0;
