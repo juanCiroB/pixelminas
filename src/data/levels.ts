@@ -1,29 +1,95 @@
 export type MinigameKey = 'wires' | 'switches' | 'echo' | 'code' | 'maze' | 'pipes' | 'core';
 
+export const MINIGAME_NAMES: Record<MinigameKey, string> = {
+  wires: 'CABLES',
+  switches: 'INTERRUPTORES',
+  echo: 'ECO INVERSO',
+  code: 'CÓDIGO',
+  maze: 'LABERINTO',
+  pipes: 'TUBERÍAS',
+  core: 'NÚCLEO',
+};
+
+const ALL: MinigameKey[] = ['wires', 'switches', 'echo', 'code', 'maze', 'pipes', 'core'];
+
 export interface LevelDef {
   id: number;
-  name: string; // nombre del mini juego de desactivación
-  minigame: MinigameKey;
+  name: string;
+  /**
+   * Mini juegos posibles en el nivel. Con uno solo, todas las bombas usan ese;
+   * con varios, cada bomba usa uno distinto (en orden, o al azar si random).
+   */
+  minigames: MinigameKey[];
+  random?: boolean;
+  tier: number; // 0..3: escalón de dificultad de los mini juegos
   cols: number;
   rows: number;
   bombs: number;
-  time: number; // segundos para completar el nivel (se pausa al desactivar)
+  time: number; // segundos del buscaminas (se pausa al desactivar)
   wrongFlagPenalty: number; // segundos que resta una bandera mal puesta
 }
 
-export const DEFUSE_TIME = 180; // 3 minutos para cada bomba
+export const DEFUSE_TIME = 180; // 3 minutos para cada mini juego
 export const STRIKE_PENALTY = 20; // segundos que resta un error dentro del mini juego
+export const MAX_DIFFICULTY = 6;
 
-// La dificultad sube por tres vías: tablero más grande, menos tiempo de margen
-// y castigo mayor por bandera falsa, además de un mini juego más complejo.
-export const LEVELS: LevelDef[] = [
-  { id: 1, name: 'CABLES', minigame: 'wires', cols: 8, rows: 10, bombs: 5, time: 150, wrongFlagPenalty: 10 },
-  { id: 2, name: 'INTERRUPTORES', minigame: 'switches', cols: 8, rows: 11, bombs: 5, time: 150, wrongFlagPenalty: 12 },
-  { id: 3, name: 'ECO INVERSO', minigame: 'echo', cols: 9, rows: 11, bombs: 5, time: 160, wrongFlagPenalty: 15 },
-  { id: 4, name: 'CÓDIGO', minigame: 'code', cols: 9, rows: 12, bombs: 5, time: 160, wrongFlagPenalty: 18 },
-  { id: 5, name: 'LABERINTO', minigame: 'maze', cols: 9, rows: 13, bombs: 5, time: 170, wrongFlagPenalty: 20 },
-  { id: 6, name: 'TUBERÍAS', minigame: 'pipes', cols: 10, rows: 13, bombs: 5, time: 170, wrongFlagPenalty: 25 },
-  { id: 7, name: 'NÚCLEO', minigame: 'core', cols: 10, rows: 14, bombs: 5, time: 180, wrongFlagPenalty: 30 },
+// Progresión en cuatro tramos:
+//  1-7   presentan cada mini juego en su versión más amable (tier 0).
+//  8-14  repiten los mini juegos más exigentes (tier 1).
+//  15-17 mezclan mini juegos dentro del mismo nivel (tier 2).
+//  18-20 caos: mini juego al azar por bomba, en su versión más difícil (tier 2-3).
+// En paralelo el tablero crece, el tiempo del buscaminas baja y la bandera falsa castiga más.
+type Row = [name: string, minigames: MinigameKey[], tier: number, cols: number, rows: number, time: number, penalty: number, random?: boolean];
+
+const TABLE: Row[] = [
+  ['CABLES', ['wires'], 0, 8, 10, 180, 5],
+  ['INTERRUPTORES', ['switches'], 0, 8, 10, 175, 6],
+  ['ECO INVERSO', ['echo'], 0, 8, 11, 175, 8],
+  ['CÓDIGO', ['code'], 0, 8, 11, 170, 10],
+  ['LABERINTO', ['maze'], 0, 9, 11, 170, 10],
+  ['TUBERÍAS', ['pipes'], 0, 9, 12, 165, 12],
+  ['NÚCLEO', ['core'], 0, 9, 12, 165, 12],
+  ['CABLES II', ['wires'], 1, 9, 12, 160, 14],
+  ['INTERRUPTORES II', ['switches'], 1, 9, 13, 160, 15],
+  ['ECO INVERSO II', ['echo'], 1, 9, 13, 155, 16],
+  ['CÓDIGO II', ['code'], 1, 10, 13, 155, 18],
+  ['LABERINTO II', ['maze'], 1, 10, 13, 150, 18],
+  ['TUBERÍAS II', ['pipes'], 1, 10, 13, 150, 20],
+  ['NÚCLEO II', ['core'], 1, 10, 14, 150, 20],
+  ['MEZCLA I', ['wires', 'switches', 'echo', 'wires', 'switches'], 2, 10, 14, 145, 22],
+  ['MEZCLA II', ['code', 'maze', 'pipes', 'code', 'maze'], 2, 10, 14, 140, 24],
+  ['MEZCLA III', ['core', 'echo', 'pipes', 'code', 'core'], 2, 10, 14, 135, 25],
+  ['CAOS', ALL, 2, 10, 14, 130, 26, true],
+  ['CAOS II', ALL, 3, 10, 14, 125, 28, true],
+  ['DETONADOR FINAL', ALL, 3, 10, 14, 120, 30, true],
 ];
 
+export const LEVELS: LevelDef[] = TABLE.map(([name, minigames, tier, cols, rows, time, wrongFlagPenalty, random], i) => ({
+  id: i + 1,
+  name,
+  minigames,
+  random,
+  tier,
+  cols,
+  rows,
+  bombs: 5,
+  time,
+  wrongFlagPenalty,
+}));
+
 export const getLevel = (id: number): LevelDef => LEVELS[Math.min(Math.max(id, 1), LEVELS.length) - 1];
+
+/** Mini juego de una bomba concreta del nivel. */
+export function minigameFor(lvl: LevelDef, bombIndex: number): MinigameKey {
+  if (lvl.random) return lvl.minigames[Math.floor(Math.random() * lvl.minigames.length)];
+  return lvl.minigames[bombIndex % lvl.minigames.length];
+}
+
+/**
+ * Dificultad del mini juego en una escala 0..6. Sube con el tramo del nivel y,
+ * dentro del nivel, cada dos bombas: 0-2 en tier 0, 2-4 en tier 1, 4-6 en tier 2
+ * y siempre 6 en tier 3.
+ */
+export function difficultyFor(lvl: LevelDef, bombIndex: number): number {
+  return Math.min(MAX_DIFFICULTY, lvl.tier * 2 + Math.floor(bombIndex / 2));
+}

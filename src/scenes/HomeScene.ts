@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { C, GAME_H, GAME_W, PAL, txt } from '../theme';
+import { LEVELS } from '../data/levels';
 import { Save } from '../services/Save';
 import { Sfx } from '../services/Sfx';
 import { PixelButton, panel } from '../ui/PixelButton';
@@ -59,7 +60,7 @@ export class HomeScene extends Phaser.Scene {
     refresh();
 
     const best = Save.totalBest();
-    txt(this, cx, 560, `NIVEL MÁX: ${Save.data.unlocked}/7   RÉCORD: ${best}`, 8, PAL.silver);
+    txt(this, cx, 560, `NIVEL MÁX: ${Save.data.unlocked}/${LEVELS.length}   RÉCORD: ${best}`, 8, PAL.silver);
     txt(this, cx, 620, 'v1.0', 8, PAL.gray);
 
     // Easter egg #2: código Konami con teclado (en PC) activa el "modo gato".
@@ -71,7 +72,7 @@ export class HomeScene extends Phaser.Scene {
     Sfx.play('blip');
     this.tweens.add({ targets: logo, y: 110, duration: 60, yoyo: true });
     if (this.logoTaps === 7) {
-      Save.set('unlocked', 7);
+      Save.set('unlocked', LEVELS.length);
       Save.findEgg('logo');
       Sfx.play('egg');
       confetti(this);
@@ -110,7 +111,7 @@ export class HomeScene extends Phaser.Scene {
       '',
       'Si explota una bomba o se acaba el tiempo, el nivel se reinicia.',
       '',
-      'Desactiva las 5 bombas para pasar de nivel. Hay 7 niveles, cada uno con un mini juego distinto y más difícil.',
+      'Desactiva las 5 bombas para pasar de nivel. Hay 20 niveles: primero conoces los 7 mini juegos, luego vuelven más difíciles y al final se mezclan.',
     ];
     const t = txt(this, GAME_W / 2, GAME_H / 2 - 30, lines.join('\n'), 8, PAL.white, {
       wordWrap: { width: 290 },

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, GAME_H, GAME_W, PAL, formatTime, txt } from '../theme';
-import { DEFUSE_TIME, MinigameKey, STRIKE_PENALTY, getLevel } from '../data/levels';
+import { DEFUSE_TIME, MINIGAME_NAMES, MinigameKey, STRIKE_PENALTY, difficultyFor, getLevel, minigameFor } from '../data/levels';
 import { Save } from '../services/Save';
 import { Sfx } from '../services/Sfx';
 import { floatText } from '../ui/fx';
@@ -42,6 +42,7 @@ export class DefuseScene extends Phaser.Scene {
 
   create(data: { level: number; bombIndex: number }): void {
     const lvl = getLevel(data.level);
+    const key = minigameFor(lvl, data.bombIndex);
     this.timeLeft = DEFUSE_TIME;
     this.lastSecond = DEFUSE_TIME;
     this.finished = false;
@@ -53,7 +54,7 @@ export class DefuseScene extends Phaser.Scene {
     // Encabezado con el temporizador tipo display LED.
     this.add.rectangle(0, 0, GAME_W, 86, C.purple).setOrigin(0);
     this.add.rectangle(0, 86, GAME_W, 4, C.ink).setOrigin(0);
-    const title = txt(this, GAME_W / 2, 16, '¡DESACTIVA LA BOMBA!', 8, PAL.yellow);
+    const title = txt(this, GAME_W / 2, 16, `¡DESACTIVA! ${MINIGAME_NAMES[key]}`, 8, PAL.yellow);
     this.tweens.add({ targets: title, alpha: 0.3, duration: 400, yoyo: true, repeat: -1 });
     this.add.image(36, 50, Save.data.catMode ? 'cat' : 'bomb').setScale(2.5);
     this.add.rectangle(GAME_W / 2, 52, 130, 44, C.ink).setStrokeStyle(3, C.red);
@@ -66,11 +67,11 @@ export class DefuseScene extends Phaser.Scene {
     const host: MGHost = {
       scene: this,
       area: new Phaser.Geom.Rectangle(10, 104, GAME_W - 20, GAME_H - 114),
-      difficulty: data.bombIndex,
+      difficulty: difficultyFor(lvl, data.bombIndex),
       success: () => this.onSuccess(),
       strike: (s, why) => this.strike(s ?? STRIKE_PENALTY, why),
     };
-    this.game_ = new MINIGAMES[lvl.minigame](host);
+    this.game_ = new MINIGAMES[key](host);
     this.game_.build();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game_.destroy());

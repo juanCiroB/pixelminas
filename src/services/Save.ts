@@ -1,3 +1,5 @@
+import { LEVELS } from '../data/levels';
+
 // Persistencia de datos: todo lo que debe sobrevivir entre vistas y entre sesiones
 // se guarda en localStorage (dentro de la app Android vive en el WebView de Capacitor).
 // El estado temporal de una partida viaja entre escenas con el registry de Phaser.
@@ -9,7 +11,7 @@ export interface RunEntry {
 }
 
 export interface SaveData {
-  unlocked: number; // nivel más alto desbloqueado (1..7)
+  unlocked: number; // nivel más alto desbloqueado
   best: Record<number, number>; // mejor puntaje por nivel
   history: RunEntry[]; // últimos niveles superados
   sound: boolean;
@@ -55,7 +57,7 @@ class SaveStore {
     const prev = this.data.best[level] ?? 0;
     const isRecord = score > prev;
     if (isRecord) this.data.best[level] = score;
-    this.data.unlocked = Math.max(this.data.unlocked, Math.min(level + 1, 7));
+    this.data.unlocked = Math.max(this.data.unlocked, Math.min(level + 1, LEVELS.length));
     this.data.history.unshift({ level, score, date: new Date().toISOString() });
     this.data.history = this.data.history.slice(0, 20);
     this.persist();
