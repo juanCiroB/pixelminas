@@ -4,6 +4,40 @@ Esta carpeta tiene todo lo que se puede preparar desde el repositorio. Lo que
 queda son pasos que exigen tu identidad, tu dinero o tu firma, y esos solo
 los puedes hacer tú.
 
+## Estado en Play Console (4 de noviembre de 2026)
+
+La app ya está creada en la cuenta **holamundo.co**.
+
+| Dato | Valor |
+|---|---|
+| Cuenta de desarrollador | `6214002968277560371` |
+| ID de la app | `4973063558207867990` |
+| Paquete | `com.pixelminas.game` |
+| Enlace | <https://play.google.com/console/u/0/developers/6214002968277560371/app/4973063558207867990/app-dashboard> |
+
+Hecho:
+
+- App creada: nombre, paquete, es-419, juego, gratis y las dos declaraciones.
+- Ficha de Play Store guardada como borrador: descripción breve (72/80),
+  descripción completa (1807/4000), icono, gráfico destacado y tres capturas.
+- Versión de **prueba interna** guardada como borrador con el AAB: versión
+  1 (1.0), API 24+, SDK de destino 36, todas las ABI.
+
+Pendiente:
+
+- Los nueve formularios de **Contenido de la app**.
+- **Configuración de la tienda**: categoría (Rompecabezas) y correo de contacto.
+- Enviar a revisión.
+
+El bloqueo principal es la política de privacidad: Play exige una URL pública
+que cargue, y la de GitHub Pages todavía da 404. **Solo Juan Andrés puede
+activarla**, porque en `juanCiroB/pixelminas` la otra cuenta tiene permiso de
+escritura pero no de administrador. Además el repositorio es privado, y Pages
+en repositorios privados requiere plan de pago: hay que hacerlo público antes.
+
+Al subir la siguiente versión hay que incrementar `versionCode` en
+`android/app/build.gradle`. Play ya consumió el 1 y rechaza repetirlo.
+
 ## Ya está listo
 
 | Qué | Dónde |
