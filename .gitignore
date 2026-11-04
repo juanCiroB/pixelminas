@@ -8,3 +8,10 @@ android/local.properties
 *.jks
 .DS_Store
 .claude/
+
+# Credenciales de firma de Android: nunca al repositorio
+android/keystore.properties
+
+# Configuración local de Android Studio / IntelliJ
+.idea/
+android/.idea/
