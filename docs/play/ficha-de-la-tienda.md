@@ -79,11 +79,11 @@ Desactiva o explota.
 |---|---|---|
 | Icono de la tienda | `docs/play/icono-512.png` | 512 × 512 |
 | Gráfico destacado | `docs/play/grafico-destacado-1024x500.png` | 1024 × 500 |
-| Captura 1 | `docs/play/capturas/1-menu.png` | 1080 × 2400 |
-| Captura 2 | `docs/play/capturas/2-niveles.png` | 1080 × 2400 |
-| Captura 3 | `docs/play/capturas/3-partida.png` | 1080 × 2400 |
+| Captura 1 — menú | `docs/play/capturas/1-menu.png` | 1200 × 2400 |
+| Captura 2 — niveles | `docs/play/capturas/2-niveles.png` | 1200 × 2400 |
+| Captura 3 — partida | `docs/play/capturas/3-partida.png` | 1200 × 2400 |
 
-Play pide un mínimo de dos capturas de teléfono y admite hasta ocho. Vale la pena
+Play pide un mínimo de dos capturas de teléfono y admite hasta ocho, y **rechaza las que tengan una proporción mayor a 2:1**. Las del emulador salen a 1080 × 2400 (1:2,22), así que están ensanchadas a 1200 × 2400 con franjas del color de fondo del juego. Vale la pena
 añadir una cuarta del modo desactivación: entra a un nivel, pon una bandera sobre
 una bomba y usa el botón de captura del teléfono.
 
