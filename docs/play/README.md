@@ -29,28 +29,33 @@ varios días en aprobarla, así que empieza por aquí.
 También hay que aceptar el Acuerdo de Distribución para Desarrolladores. Es un
 contrato a tu nombre: tiene que firmarlo una persona, no una herramienta.
 
-### 2. Crear el almacén de claves
+### 2. El almacén de claves (ya creado)
 
-Desde la carpeta `android/`:
+Existe en `android/pixelminas.jks`, con alias `pixelminas` y validez de 10.000
+días. Sus credenciales están en `android/keystore.properties`. Ninguno de los
+dos está en el repositorio: el `.gitignore` los bloquea.
 
-```bash
-keytool -genkeypair -v -keystore pixelminas.jks -keyalg RSA -keysize 2048 -validity 10000 -alias pixelminas
+**Haz esto hoy:** abre `android/keystore.properties`, copia la contraseña a tu
+gestor de contraseñas y guarda una copia del `.jks` fuera del equipo. Esta es
+la clave de subida de la aplicación. Con Play App Signing, si se pierde se
+puede pedir un restablecimiento a Google, pero el trámite tarda días.
+
+**Nunca la subas al repositorio ni la pegues en un chat.** Si Juan Andrés
+necesita generar releases, pásale el `.jks` y la contraseña por un canal
+privado, no por GitHub.
+
+Para rehacer el almacén desde cero, si alguna vez hiciera falta, está la
+plantilla `android/keystore.properties.example` con el comando.
+
+Huella del certificado de subida, para cotejarla en Play Console cuando pida
+confirmar la clave (esto no es secreto, se puede compartir):
+
+```
+SHA-256  67:D4:8D:72:F2:8C:61:17:92:BE:6B:CF:A7:54:C1:27:DE:31:D8:3A:22:43:07:9C:13:80:16:89:95:0A:2A:9F
 ```
 
-Te va a pedir una contraseña y algunos datos (nombre, organización, ciudad,
-país). Después copia la plantilla y rellénala con esa contraseña:
-
-```bash
-cp keystore.properties.example keystore.properties
-```
-
-**Guarda el archivo `pixelminas.jks` y su contraseña en un gestor de
-contraseñas.** Si los pierdes, Google Play no te deja volver a publicar una
-actualización de `com.pixelminas.game` nunca más: habría que empezar con otro
-identificador de aplicación y perder las instalaciones. Ni el `.jks` ni el
-`keystore.properties` se suben al repositorio; el `.gitignore` ya los bloquea.
-
-La contraseña la eliges tú y no la escribas en el chat ni en el repositorio.
+El certificado vale hasta marzo de 2054, muy por encima del mínimo que exige
+Play (octubre de 2033).
 
 ### 3. Generar el AAB firmado
 
@@ -62,7 +67,7 @@ Queda en `android/app/build/outputs/bundle/release/app-release.aab`. Para
 comprobar que salió firmado:
 
 ```bash
-jarsigner -verify -verbose android/app/build/outputs/bundle/release/app-release.aab
+jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
 ```
 
 ### 4. Publicar la política de privacidad
@@ -98,10 +103,19 @@ sube el AAB a prueba cerrada, invita a los compañeros y deja correr el plazo.
 Para la nota suele bastar con enseñar la app publicada en prueba interna o
 cerrada, con el enlace de Play Console.
 
-## Por qué no lo hice yo
+## Qué queda en manos de una persona
 
-Los pasos 1, 2, 5 y 6 piden cosas que no debo hacer en tu nombre: pagar los 25
-dólares, subir tu documento de identidad, firmar un contrato con Google, crear
-y custodiar la clave de firma de tu aplicación, y publicar contenido a nombre
-tuyo. Todo lo demás —los gráficos, los textos, la política, la configuración de
-firma y el AAB— está hecho y versionado aquí.
+La subida en sí. Conviene aclararlo porque se presta a confusión: **Android
+Studio no publica en Google Play**. Genera el AAB firmado y ahí termina su
+trabajo. La subida ocurre en la consola web, o por la Play Developer API, que
+a su vez exige crear una cuenta de servicio autorizada desde la misma consola.
+
+En ese tramo hay cuatro declaraciones legales que firma la persona titular de
+la cuenta, no una herramienta: el cumplimiento de las leyes de exportación de
+EE. UU., la conformidad con las directrices de contenido, el formulario de
+seguridad de los datos y el cuestionario de clasificación. Las respuestas
+correctas para este juego están en `ficha-de-la-tienda.md`, pero quien
+responde por ellas ante Google es el titular.
+
+Todo lo demás —gráficos, textos, política de privacidad, configuración de
+firma, almacén de claves y el AAB firmado— ya está hecho.
