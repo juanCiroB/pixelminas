@@ -38,19 +38,33 @@ La app está creada en la cuenta **holamundo.co**.
   imágenes, y las capturas son del emulador.
 - Versión de prueba interna con el AAB: versión 1 (1.0), API 24+, destino 36.
 
-### Pendiente
+### Publicada en prueba interna
 
-Solo queda la prueba interna, que **no necesita revisión de Google**:
+El 5 de noviembre de 2026 la versión 1 (1.0) quedó **Activa** en el canal de
+prueba interna, que no pasa por revisión de Google.
 
-1. **Seleccionar verificadores**: hay que crear la lista con los correos de los
-   compañeros. Admite hasta 100.
-2. **Obtener una vista previa y confirmar la versión**: el último clic.
+Enlace para instalarla (hay que aceptar la invitación con una cuenta que esté
+en la lista de verificadores):
 
-El botón "Enviar la app para su revisión" sigue deshabilitado hasta completar
-esos dos pasos.
+<https://play.google.com/apps/internaltest/4700739553055423073>
+
+Lista de verificadores: **PixelMinas**, con juanmanuelarias43@gmail.com. Admite
+hasta 100 correos y se edita en Prueba interna → Verificadores.
+
+Mientras Google no revise la app, los verificadores la verán con el nombre
+provisional `com.pixelminas.game (unreviewed)` en vez de PixelMinas. Es normal
+en la primera publicación.
 
 Al subir la siguiente versión hay que incrementar `versionCode` en
 `android/app/build.gradle`. Play ya consumió el 1 y rechaza repetirlo.
+
+### Si quieren llegar a producción
+
+Falta pulsar "Enviar la app para su revisión" en Descripción general de la
+publicación. Ojo: las cuentas personales creadas después de noviembre de 2023
+necesitan antes una prueba cerrada con 12 verificadores durante 14 días
+seguidos. Para la entrega del curso, la prueba interna ya demuestra la app
+publicada y funcionando.
 
 ## Lo que tienes que hacer tú
 
