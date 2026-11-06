@@ -4,9 +4,9 @@ Esta carpeta tiene todo lo que se puede preparar desde el repositorio. Lo que
 queda son pasos que exigen tu identidad, tu dinero o tu firma, y esos solo
 los puedes hacer tú.
 
-## Estado en Play Console (4 de noviembre de 2026)
+## Estado en Play Console (5 de noviembre de 2026)
 
-La app ya está creada en la cuenta **holamundo.co**.
+La app está creada en la cuenta **holamundo.co**.
 
 | Dato | Valor |
 |---|---|
@@ -15,42 +15,42 @@ La app ya está creada en la cuenta **holamundo.co**.
 | Paquete | `com.pixelminas.game` |
 | Enlace | <https://play.google.com/console/u/0/developers/6214002968277560371/app/4973063558207867990/app-dashboard> |
 
-Hecho:
+### Hecho
 
 - App creada: nombre, paquete, es-419, juego, gratis y las dos declaraciones.
-- Ficha de Play Store guardada como borrador: descripción breve (72/80),
-  descripción completa (1807/4000), icono, gráfico destacado y tres capturas.
-- Versión de **prueba interna** guardada como borrador con el AAB: versión
-  1 (1.0), API 24+, SDK de destino 36, todas las ABI.
+- **Las diez declaraciones de Contenido de la app están completas.** Play muestra
+  "Ya estás al día" en la pestaña *Requiere atención*.
+- Política de privacidad apuntando a GitHub Pages, que ya responde 200.
+- Seguridad de los datos: no recopila ni comparte.
+- Clasificación del contenido: completada con la IARC, todo "No".
+- Público objetivo: 13-15, 16-17 y mayores de 18. Al excluir menores, Play salta
+  los pasos del programa Familias.
+- Ficha de Play Store publicada como borrador con los textos, el icono, el
+  gráfico destacado y tres capturas de 1200x2400.
+- Categoría: **Habilidad mental**. Ojo: en la lista de Play **no existe
+  "Rompecabezas"**; las 17 opciones de juego son Acción, Arcade, Aventura,
+  Carreras, Cartas, Casino, Casuales, Deportes, Educativos, Estrategia,
+  Habilidad mental, Juegos de mesa, Juegos de palabras, Música, Preguntas y
+  respuestas, Rol y Simulación.
+- Correo de contacto público: juanmanuelarias43@gmail.com
+- Declaración de recursos de IA: "No etiquetar recursos". El icono y el gráfico
+  se generaron con un script que dibuja píxel a píxel, no con un modelo de
+  imágenes, y las capturas son del emulador.
+- Versión de prueba interna con el AAB: versión 1 (1.0), API 24+, destino 36.
 
-Pendiente:
+### Pendiente
 
-- Los nueve formularios de **Contenido de la app**.
-- **Configuración de la tienda**: categoría (Rompecabezas) y correo de contacto.
-- Enviar a revisión.
+Solo queda la prueba interna, que **no necesita revisión de Google**:
 
-El bloqueo principal es la política de privacidad: Play exige una URL pública
-que cargue, y la de GitHub Pages todavía da 404. **Solo Juan Andrés puede
-activarla**, porque en `juanCiroB/pixelminas` la otra cuenta tiene permiso de
-escritura pero no de administrador. Además el repositorio es privado, y Pages
-en repositorios privados requiere plan de pago: hay que hacerlo público antes.
+1. **Seleccionar verificadores**: hay que crear la lista con los correos de los
+   compañeros. Admite hasta 100.
+2. **Obtener una vista previa y confirmar la versión**: el último clic.
+
+El botón "Enviar la app para su revisión" sigue deshabilitado hasta completar
+esos dos pasos.
 
 Al subir la siguiente versión hay que incrementar `versionCode` en
 `android/app/build.gradle`. Play ya consumió el 1 y rechaza repetirlo.
-
-## Ya está listo
-
-| Qué | Dónde |
-|---|---|
-| Textos de la ficha, clasificación y seguridad de datos | `ficha-de-la-tienda.md` |
-| Icono de la tienda, 512 × 512 | `icono-512.png` |
-| Gráfico destacado, 1024 × 500 | `grafico-destacado-1024x500.png` |
-| Capturas de teléfono, 1080 × 2400 | `capturas/` |
-| Política de privacidad | `../politica-de-privacidad.html` |
-| Configuración de firma en Gradle | `android/app/build.gradle` |
-| Plantilla de credenciales | `android/keystore.properties.example` |
-
-El AAB sin firmar ya compila: `android/app/build/outputs/bundle/release/app-release.aab`.
 
 ## Lo que tienes que hacer tú
 
